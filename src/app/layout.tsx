@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Lexend } from "next/font/google";
 import "./globals.css";
-import { Nav } from "@/app/components/header";
 import { MainProvider } from "@/providers/maincontext";
+import { Modal } from "./components/modal";
+import AdSense from "./components/AdSense/AdSense";
 
 const lexend = Lexend({
   variable: "--font-lexend",
@@ -11,8 +12,8 @@ const lexend = Lexend({
 
 
 export const metadata: Metadata = {
-  title: "CupomPDF",
-  description: "Crie comprovantes, orçamentos em PDF online!",
+  title: "Comprovante PDF",
+  description: "Crie orçamentos, simule cupons, notas em PDF online. Baixe ou imprima, grátis!",
   authors: {
     name: "Hermes Lopes Junior",
     url: "hstech.com.br"
@@ -25,12 +26,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-
     <html lang="pt-br">
+      <head>
+        
+      </head>
       <body
         className={`${lexend.variable} antialiased`}>
         <MainProvider>
-          <Nav></Nav>
+        <AdSense pId={process.env.NEXT_PUBLIC_PUB_ID as string}></AdSense>
+          <Modal></Modal>
           {children}
         </MainProvider>
       </body>

@@ -1,18 +1,14 @@
 'use client'
 import Image from "next/image";
-import { useEffect, useContext } from "react";
+import { useEffect, useContext, useState } from "react";
 import { MainContext } from "@/providers/maincontext";
 
 
 
 export function OptionCabecalho() {
-    // const [imageLogo, setImageLogo] = useState<string>();
-    // const [cabecalho, setCabecalho] = useState<CabecalhoProps | null>();
-    // const [query, setQuery] = useState(0);
-    // const [isOpenForm, setIsOpenForm] = useState<boolean>();
-    const {imageLogo, onReqSetImageLogo, cabecalho, onReqSetCabecalho, query, onReqHandleLogo, onReqRemoveLogo, onReqHandleCabecalho, isOpenForm, onReqSetIsOpenForm } = useContext(MainContext);
+    const { imageLogo, onReqSetImageLogo, cabecalho, onReqSetCabecalho, query, onReqHandleLogo, onReqRemoveLogo, onReqHandleCabecalho, isOpenForm, onReqSetIsOpenForm } = useContext(MainContext);
 
-
+    const [isCabecalhoExtendido, setIsCabecalhoExtendido] = useState<boolean>(true);
     useEffect(() => {
         const header = localStorage.getItem('header');
         const logo = localStorage.getItem('logo');
@@ -22,105 +18,88 @@ export function OptionCabecalho() {
         }
 
         onReqSetCabecalho(header && JSON.parse(header));
-    }
-        , [query])
+        if (header && logo) {
+            setIsCabecalhoExtendido(false);
+            onReqSetIsOpenForm(false)
+        }
+    },[query])
 
-
-    // function handleLogo(e: ChangeEvent<HTMLInputElement>) {
-    //     if (e.target.files) {
-    //         const reader = new FileReader();
-    //         const image = e.target.files[0];
-    //         reader.onloadend = () => {
-    //             const base64Str = reader.result as string;
-    //             //if (base64Str) {
-    //             localStorage.setItem('logo', base64Str)
-    //             onReqSetImageLogo(base64Str)
-    //             //}
-    //         }
-    //         reader.onerror = () => {
-    //             window.alert('erro aí viado')
-    //         }
-
-    //         reader.readAsDataURL(image);
-    //         setQuery(Date.now())
-    //     }
-    // }
-
-    // function handleCabecalho(formData: FormData) {
-    //     const data = Object.fromEntries(formData.entries());
-
-    //     localStorage.setItem('header', JSON.stringify(data))
-
-    //     setIsOpenForm(!isOpenForm)
-
-    //     setQuery(Date.now())
-    // }
-
-    // function removeLogo(){
-    //     localStorage.removeItem('logo');
-    //     setImageLogo('');
-    //     setQuery(Date.now());
-    // }
 
     return (
-        <div className="flex flex-col min-w-72 w-full gap-1 p-0.5 sm:w-full sm:p-4">
+        <div className="flex flex-col min-w-72 w-full gap-1 text-xs p-1 sm:w-full sm:p-4 md:p-4 lg:p-4 xl:p-4 ">
             {(cabecalho && !isOpenForm) &&
-                <div className="flex flex-col w-full bg-gray-200 rounded ">
-                    <div className="">Nome fantasia: {cabecalho.nome_fantasia}</div>
-                    <div className="">Razão social: {cabecalho.razao_social}</div>
-                    <div className="">CNPJ: {cabecalho.cnpj}</div>
-                    <div className="">Contato: {cabecalho.contato_empresa}</div>
-                    {imageLogo &&
-                        <div>
-                            Logo:
-                            <div className="h-12 w-12 relative">
-                                <Image alt='logo preview' fill src={imageLogo} className="absolute object-cover"></Image>
+                <div className="flex flex-col w-full bg-gray-200 rounded p-1 border-2 border-black sm:p-2 md:p-2 lg:p-2 xl:p-2 transition-all">
+                    {isCabecalhoExtendido ? <>
+                        <button className=" ease-in-out text-xs font-medium hover:scale-105 transition-all sm:text-sm" onClick={() => setIsCabecalhoExtendido(false)}>
+                            Encolher Cabeçalho 👆
+                        </button>
+                        <div className="">Nome fantasia: {cabecalho.nome_fantasia}</div>
+                        <div className="">Razão social: {cabecalho.razao_social}</div>
+                        <div className="">CNPJ: {cabecalho.cnpj}</div>
+                        <div className="">Contato: {cabecalho.contato_empresa}</div>
+                        {imageLogo &&
+                            <div>
+                                Logo:
+                                <div className="h-12 w-12 relative">
+                                    <Image alt='logo preview' fill src={imageLogo} className="absolute object-fill"></Image>
+                                </div>
                             </div>
-                        </div>
+                        }
+                        <button type="button" onClick={() => onReqSetIsOpenForm(true)}
+                            className="flex flex-col self-center py-0 px-1 rounded bg-green-600 border-2 border-black border-opacity-50 text-xs
+                                sm:text-sm">Editar cabeçalho</button>
+                    </>
+                        :
+                        <>
+                            <button className="text-xs font-medium hover:scale-105 transition-all sm:text-sm" onClick={() => setIsCabecalhoExtendido(true)}>
+                                Extender Cabeçalho 👇
+                            </button>
+                        </>
                     }
-                    <button type="button" onClick={() => onReqSetIsOpenForm()}
-                        className="flex flex-col self-center py-0 px-1 rounded bg-green-600 border-2 border-black border-opacity-50 text-sm">Editar cabeçalho</button>
                 </div>
             }
 
             {/* Formulário do cabeçalho! */}
             {
                 isOpenForm &&
-                <form action={onReqHandleCabecalho}>
+                <form action={onReqHandleCabecalho} className="flex flex-col w-full bg-gray-200 rounded p-1 border-2 border-black sm:p-2 md:p-2 lg:p-2 xl:p-2">
                     <h2>Cabeçalho:</h2>
-                    <div className="flex flex-col items-start text-xs">
+                    <div className="flex flex-col items-start text-xs sm:text-sm">
                         <label>Nome Fantasia:</label>
                         <input type="text" name="nome_fantasia" defaultValue={cabecalho?.nome_fantasia}
                             placeholder="Digite o nome fantasia da empresa" className="border-2 border-black rounded w-full p-0.5 sm:p-1 text-center" />
                     </div>
-                    <div className="flex flex-col items-start text-xs">
+                    <div className="flex flex-col items-start text-xs sm:text-sm">
                         <label>Razão Social:</label>
                         <input type="text" name="razao_social" defaultValue={cabecalho?.razao_social}
                             placeholder="Digite a razao social da empresa" className="border-2 border-black rounded w-full p-0.5 sm:p-1 text-center" />
                     </div>
-                    <div className="flex flex-col items-start text-xs">
+                    <div className="flex flex-col items-start text-xs sm:text-sm">
                         <label>CNPJ:</label>
                         <input type="text" name="cnpj" defaultValue={cabecalho?.cnpj}
                             placeholder="Digite o CNPJ da empresa" className="border-2 border-black rounded w-full p-0.5 sm:p-1 text-center" />
                     </div>
-                    <div className="flex flex-col items-start text-xs">
+                    <div className="flex flex-col items-start text-xs sm:text-sm">
                         <label>Contato:</label>
                         <input type="text" name="contato_empresa" defaultValue={cabecalho?.contato_empresa}
                             placeholder="Digite o contato da empresa" className="border-2 border-black rounded w-full p-0.5 sm:p-1 text-center" />
                     </div>
-                    <div className="flex flex-col items-start text-xs">
+                    <div className="flex flex-col items-start text-xs sm:text-sm">
                         <label>Logo da empresa:</label>
                         {
                             imageLogo
                                 ?
-                                <div>
-                                    <span>Clique na logo para removê-la</span>
-                                    <div className="rounded w-12 h-12 p-0.5 sm:p-1 text-center relative" onClick={()=>onReqRemoveLogo()}>
-                                        <Image src={imageLogo} alt='logo' fill className="object-contain" />
+                                <div className="flex flex-row gap-4 justify-evenly w-full">
+                                    <div className="rounded w-16 h-16 p-0.5 sm:p-1 relative " onClick={() => onReqRemoveLogo()}>
+                                        <Image src={imageLogo} alt='logo' fill className="object-fill absolute" />
 
                                     </div>
-                                    
-                                
+                                    <div className="flex-col flex items-start justify-evenly">
+                                        <span>Clique na logo para removê-la</span>
+                                        <p className="text-[9px] text-red-600 sm:text-xs">Para melhor adequação da logo é necessário que a altura seja igual a altura!</p>
+                                    </div>
+
+
                                 </div>
                                 :
                                 <div className="border-2 border-black rounded w-full p-0.5 sm:p-1 text-center">
@@ -131,7 +110,7 @@ export function OptionCabecalho() {
 
                     </div>
                     <button type="submit"
-                        className="flex flex-col self-center py-0 px-1 rounded bg-green-600 border-2 border-black border-opacity-50 text-sm">Definir cabeçalho</button>
+                        className="flex flex-col m-auto self-center py-0 px-1 rounded bg-green-600 border-2 border-black border-opacity-50 text-sm">Definir cabeçalho</button>
                 </form>
             }
         </div>

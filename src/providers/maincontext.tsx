@@ -19,7 +19,10 @@ type MainContextData = {
     onReqRemoveLogo: ()=>void;
     onReqHandleCabecalho: (formData: FormData)=>void;
     isOpenForm: boolean;
-    onReqSetIsOpenForm: ()=>void;
+    onReqSetIsOpenForm: (value: boolean)=>void;
+    isAllowedCookies?: boolean;
+    onReqSetIsAllowedCookies: (value: boolean)=>void;
+    imageLogoWidth?: number;
 }
 
 type ContextProps = {
@@ -41,9 +44,11 @@ export function MainProvider({ children } : ContextProps ) {
     const [produtos, setProdutos] = useState<Array<Produto>>();
     const [valorTotal, setValorTotal] = useState<number>(0);
     const [imageLogo, setImageLogo] = useState<string>();
+    const [imageLogoWidth, setImageLogoWidth] = useState<number>();
     const [cabecalho, setCabecalho] = useState<CabecalhoProps | null>(null);
     const [query, setQuery] = useState(0);
     const [isOpenForm, setIsOpenForm] = useState<boolean>(cabecalho ? false : true);
+    const [isAllowedCookies, setIsAllowedCookies] = useState<boolean>();
     
     function onReqSetCliente(cliente : Cliente){
         setCliente(cliente);
@@ -83,15 +88,25 @@ export function MainProvider({ children } : ContextProps ) {
         if (e.target.files) {
             const reader = new FileReader();
             const image = e.target.files[0];
+            const img = new Image();
+            
+            
+            img.onload = ()=>{
+                setImageLogoWidth(img.width)
+
+            }
+
             reader.onloadend = () => {
                 const base64Str = reader.result as string;
                 localStorage.setItem('logo', base64Str);
                 onReqSetImageLogo(base64Str);
             }
+            
             reader.onerror = () => {
                 window.alert('erro ao definir logo')
             }
-
+            
+            img.src = URL.createObjectURL(image)
             reader.readAsDataURL(image);
             setQuery(Date.now())
         }
@@ -99,9 +114,19 @@ export function MainProvider({ children } : ContextProps ) {
     function onReqSetQuery(){
         setQuery(Date.now());
     }
-    function onReqSetIsOpenForm(){
-        setIsOpenForm(!isOpenForm);
+
+    function onReqSetIsOpenForm(value: boolean){
+        setIsOpenForm(value);
     }
+    
+    function onReqSetIsAllowedCookies(value: boolean){
+        if(value === true) {
+            localStorage.setItem("isAllowedCookies", 'true')
+        }
+        setIsAllowedCookies(value)
+    }
+
+    
 
 
     return(
@@ -122,7 +147,10 @@ export function MainProvider({ children } : ContextProps ) {
             onReqRemoveLogo,
             onReqHandleCabecalho,
             isOpenForm,
-            onReqSetIsOpenForm
+            onReqSetIsOpenForm,
+            isAllowedCookies,
+            onReqSetIsAllowedCookies,
+            imageLogoWidth
         }}>
         {children}
         </MainContext.Provider>

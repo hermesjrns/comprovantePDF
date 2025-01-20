@@ -137,14 +137,15 @@ export function ContainerProduct() {
 
                         </div>
                         {produtos.map((prod, index) => (
-                            <div key={index} className="grid grid-cols-9 text-xs bg-gray-200  p-0.5 py-0 items-center sm:px-2 border-b-[1px] border-black border-opacity-40">
+                            <div key={index} className="grid grid-cols-9 text-xs bg-gray-200  p-0.5 py-0 items-center sm:px-2 border-b-[1px] border-black border-opacity-40
+                                sm:text-sm">
                                 <div className="text-start col-span-5">{prod.produto}</div>
                                 <div className="text-center">{prod.qtd}</div>
-                                <div className="text-center"><span className="hidden sm:inline-block">R$</span>{prod.valor.toString().replace('.',',')}</div>
+                                <div className="text-center"><span className="hidden sm:inline-block">R$</span>{prod.valor.toFixed(2).toString().replace('.',',')}</div>
                                 <div className="text-end col-span-2"><span className="hidden sm:inline-block">R$</span>{prod.subtotal?.toString().replace('.',',')}</div>
                             </div>
                         ))}
-                        <div className="text-xs pt-0.5 pl-0.5 m-0 sm:px-2">
+                        <div className="text-xs pt-0.5 pl-0.5 m-0 sm:px-2 sm:text-sm">
                             <span className="">
                                 Valor final: R${valorTotal?.toFixed(2)?.toString().replace('.',',')}
                             </span>
@@ -152,7 +153,7 @@ export function ContainerProduct() {
 
                     </>
                     :
-                    <span>Cadastre produtos, eles irão aparecer aqui...</span>
+                    <span className="px-2 text-xs sm:text-md sm:px-4">Cadastre produtos, eles irão aparecer aqui...</span>
                 }
             </div>
             <div className="flex flex-col items-start text-xs">
@@ -167,10 +168,12 @@ export function ContainerProduct() {
                 <label>Valor:</label>
                 <input type="text" name="valor" placeholder="Valor" className="border-2 border-black rounded w-full p-0.5 sm:p-1 text-center" />
             </div>
+            <div className="w-36 m-auto flex flex-col gap-2">
             <button type="submit"
-                className="flex flex-col rounded bg-green-600 border-black border-2 px-1 py-0 self-center border-opacity-50 text-sm">Adicionar</button>
+                className="flex flex-col w-full rounded bg-green-600 border-black border-2 px-1 py-0 self-center border-opacity-50 text-sm hover:scale-105 transition-all">Adicionar</button>
             <button type="button" onClick={() => visualizarNota()}
-                className="flex flex-col self-center py-0 px-1 rounded bg-yellow-500 border-2 border-black border-opacity-50 text-sm">👁 Visualizar</button>
+                className="flex flex-col w-full  self-center py-0 px-1 rounded bg-yellow-500 border-2 border-black border-opacity-50 text-sm hover:scale-105 transition-all">Visualizar</button>
+            </div>
         </form>
 
     )

@@ -1,4 +1,9 @@
 @tailwind base;
+@layer base {
+  img {
+    @apply inline-block; 
+  }
+}
 @tailwind components;
 @tailwind utilities;
 
@@ -37,7 +42,7 @@ body {
     width: 210mm;
     height: 297mm;
     padding: 20mm;
-    margin: 10mm auto;
+    margin: 0;
     background: theme(colors.white);
     position: relative;
     @media print {
