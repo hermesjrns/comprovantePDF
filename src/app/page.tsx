@@ -38,7 +38,7 @@ export default function Home() {
             <h1>Acesse a ferramenta:</h1>
             <Link href={'/criar'} className="">
               <button type="button"
-                className="flex flex-col w-full rounded-md bg-black border-white shadow-black shadow-sm border-2 p-2 self-center border-opacity-50 text-white font-bold text-center
+                className="block w-full rounded-md bg-black border-white shadow-black shadow-sm border-2 p-2 self-center border-opacity-50 text-white font-bold text-center
                   hover:scale-105 hover:bg-green-600  transition-all">Criar Agora</button>
 
             </Link>

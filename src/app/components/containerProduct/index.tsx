@@ -168,11 +168,11 @@ export function ContainerProduct() {
                 <label>Valor:</label>
                 <input type="text" name="valor" placeholder="Valor" className="border-2 border-black rounded w-full p-0.5 sm:p-1 text-center" />
             </div>
-            <div className="w-36 m-auto flex flex-col gap-2">
+            <div className="w-36 m-auto flex flex-col gap-2 text-center">
             <button type="submit"
-                className="flex flex-col w-full rounded bg-green-600 border-black border-2 px-1 py-0 self-center border-opacity-50 text-sm hover:scale-105 transition-all">Adicionar</button>
+                className="block w-full rounded bg-green-600  border-black border-2 px-1 py-0 self-center border-opacity-50 text-sm hover:scale-105 transition-all">Adicionar</button>
             <button type="button" onClick={() => visualizarNota()}
-                className="flex flex-col w-full  self-center py-0 px-1 rounded bg-yellow-500 border-2 border-black border-opacity-50 text-sm hover:scale-105 transition-all">Visualizar</button>
+                className="block w-full  self-center py-0 px-1 rounded bg-yellow-500 border-2 border-black border-opacity-50 text-sm hover:scale-105 transition-all">Visualizar</button>
             </div>
         </form>
 
