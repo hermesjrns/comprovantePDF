@@ -22,9 +22,6 @@ export interface ErrorInput {
 }
 
 export function ContainerProduct() {
-
-    // const [produtos, setProdutos] = useState<Array<Produto>>([]);
-    // const [cliente, setCliente] = useState<Cliente>();
     const [errorInput, setErrorInput] = useState<ErrorInput>();
     const { cliente, onReqSetCliente, produtos, onReqSetProdutos, valorTotal, onReqSetValorTotal } = useContext(MainContext);
     const router = useRouter();

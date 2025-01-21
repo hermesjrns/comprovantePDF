@@ -2,7 +2,7 @@
 import { ContainerProduct } from "@/app/components/containerProduct";
 import { OptionCabecalho } from "@/app/components/optionCabecalho";
 import { Nav } from "@/app/components/header";
-import { AdBanner } from "../components/AdSense/AdBanner./AdBanner";
+// import { AdBanner } from "../components/AdSense/AdBanner./AdBanner";
 import { Footer } from "../components/footer";
 export default function Home() {
   return (
@@ -14,7 +14,7 @@ export default function Home() {
         lg:max-w-3xl">
         <OptionCabecalho></OptionCabecalho>
         <ContainerProduct/>
-        <AdBanner dataAdFormat="auto" dataFullWidthResponsive={true} dataAdSlot="5027419837"></AdBanner>
+        {/* <AdBanner dataAdFormat="auto" dataFullWidthResponsive={true} dataAdSlot="5027419837"></AdBanner> */}
       </main>
       <Footer></Footer>
     </div>

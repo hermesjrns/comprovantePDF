@@ -1,8 +1,10 @@
 'use client'
 import { Nav } from "@/app/components/header";
 import { Footer } from "../components/footer";
+import { useRouter } from "next/navigation";
 
 export default function PoliticasEPrivacidadePage() {
+    const router = useRouter();
     return (
         <div className="flex flex-col items-center justify-items-center min-h-dvh grow">
             <Nav></Nav>
@@ -90,6 +92,9 @@ export default function PoliticasEPrivacidadePage() {
                         </div>
                     </div>
                 </div>
+                <button type="button" onClick={router.back}
+                    className="block rounded-md bg-black border-white shadow-black shadow-sm border-2 p-1 self-center border-opacity-50 text-white font-bold text-center
+                    hover:scale-105  transition-all">Voltar</button>
             </main>
             <Footer/>
         </div>

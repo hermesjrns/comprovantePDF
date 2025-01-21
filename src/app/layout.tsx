@@ -27,13 +27,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-br">
-      <head>
-        
-      </head>
       <body
         className={`${lexend.variable} antialiased`}>
-        <MainProvider>
         <AdSense pId={process.env.NEXT_PUBLIC_PUB_ID as string}></AdSense>
+        <MainProvider>
           <Modal></Modal>
           {children}
         </MainProvider>

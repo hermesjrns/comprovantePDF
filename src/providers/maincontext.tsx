@@ -88,6 +88,10 @@ export function MainProvider({ children } : ContextProps ) {
         if (e.target.files) {
             const reader = new FileReader();
             const image = e.target.files[0];
+            if((image.type !== 'image/jpeg') && (image.type !== 'image/png')){
+                window.alert('Por favor, insira uma imagem JPEG ou PNG')
+                return;
+            }
             const img = new Image();
             
             
