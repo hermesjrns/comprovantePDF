@@ -1,15 +1,14 @@
 "use client"
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
 import { MainContext } from "@/providers/maincontext";
+import { productSchema } from "@/config/ZodSchema";
+import { z } from 'zod';
+import { ContactMask } from "@/config/mask";
 
-export interface Produto {
-    produto: string,
-    qtd: number,
-    valor: number,
-    subtotal?: number
-}
+export type Produto = z.infer<typeof productSchema>
+
 export interface Cliente {
     cliente: string | null,
     contato: string | null,
@@ -22,8 +21,10 @@ export interface ErrorInput {
 }
 
 export function ContainerProduct() {
-    const [errorInput, setErrorInput] = useState<ErrorInput>();
-    const { cliente, onReqSetCliente, produtos, onReqSetProdutos, valorTotal, onReqSetValorTotal } = useContext(MainContext);
+    const { cliente, onReqSetCliente, produtos, onReqSetProdutos, valorTotal, onReqSetValorTotal, onReqSetError } = useContext(MainContext);
+    const [qtdValue, setQtdValue] = useState<string>('')
+    const [priceValue, setPriceValue] = useState<string>('')
+    const [contactValue, setContactMask] = useState<string>('')
     const router = useRouter();
 
     function addProdutos(formData: FormData) {
@@ -38,7 +39,6 @@ export function ContainerProduct() {
         const endereco = formData.get("endereco")?.valueOf().toString();
 
         if (!produto || !qtd || !valor) {
-            console.log('erro#1')
             return;
         }
 
@@ -48,6 +48,13 @@ export function ContainerProduct() {
             valor: valor,
             subtotal: subtotal
         })
+
+        const result = productSchema.safeParse(novo_produto)
+
+        if (!result.success) {
+            const errors = result.error.errors.filter((err) => err.message)
+            onReqSetError(JSON.stringify(errors))
+        }
 
         onReqSetValorTotal(qtd * valor)
 
@@ -71,12 +78,6 @@ export function ContainerProduct() {
 
         onReqSetCliente(novo_cliente)
 
-        
-
-        console.log(cliente)
-        console.log('produtos abaixo')
-        console.log(produtos)
-        //router.refresh()
         return;
     }
 
@@ -85,17 +86,39 @@ export function ContainerProduct() {
 
     function visualizarNota() {
         if (!cliente) {
-            setErrorInput({ msg: "Campo de cliente ausente! A nota está sem o campo cliente" })
-        }
-        if (!produtos || produtos.length < 1) {
-            setErrorInput({ msg: "nao há nenhum produto cadastrado!" })
 
         }
-        console.log(errorInput)
-        console.log(`CLIENTES: ${cliente}`)
-        console.log(`PRODUTOS ${produtos}`)
+        if (!produtos || produtos.length < 1) {
+
+        }
         router.push("/visualizar")
     }
+
+    function handleQtdValue(e: ChangeEvent<HTMLInputElement>) {
+        const { value } = e.target;
+        const numericValue = value.replace(/\D/g, '')
+        setQtdValue(numericValue)
+    }
+
+    function handlePriceValue(e: ChangeEvent<HTMLInputElement>) {
+        const { value } = e.target;
+
+
+
+        const numericValue = value.replace(/[^0-9\,]|\,\Z/g, '')
+
+
+        setPriceValue(numericValue)
+    }
+
+        const handleContactMask = (e: ChangeEvent<HTMLInputElement>) => {
+            const { value } = e.target;
+            const numericValue = value.replace(/\D/g, "");
+    
+            let maskedVarContactValue = ContactMask(numericValue);
+            setContactMask(maskedVarContactValue)
+        }
+
 
     return (
 
@@ -108,7 +131,7 @@ export function ContainerProduct() {
             </div>
             <div className="flex flex-col items-start text-xs">
                 <label >Contato:</label>
-                <input type="tel" name="contato" placeholder="Contato" defaultValue={cliente?.contato ? cliente.contato : ''} className="border-2 border-black rounded w-full p-0.5 sm:p-1 text-center" />
+                <input type="tel" name="contato" placeholder="Contato" value={contactValue ? contactValue : ''} onChange={handleContactMask} className="border-2 border-black rounded w-full p-0.5 sm:p-1 text-center" />
             </div>
             <div className="flex flex-col items-start text-xs">
                 <label >Endereço:</label>
@@ -138,13 +161,13 @@ export function ContainerProduct() {
                                 sm:text-sm">
                                 <div className="text-start col-span-5">{prod.produto}</div>
                                 <div className="text-center">{prod.qtd}</div>
-                                <div className="text-center"><span className="hidden sm:inline-block">R$</span>{prod.valor.toFixed(2).toString().replace('.',',')}</div>
-                                <div className="text-end col-span-2"><span className="hidden sm:inline-block">R$</span>{prod.subtotal?.toString().replace('.',',')}</div>
+                                <div className="text-center"><span className="hidden sm:inline-block">R$</span>{prod.valor.toFixed(2).toString().replace('.', ',')}</div>
+                                <div className="text-end col-span-2"><span className="hidden sm:inline-block">R$</span>{prod.subtotal?.toString().replace('.', ',')}</div>
                             </div>
                         ))}
                         <div className="text-xs pt-0.5 pl-0.5 m-0 sm:px-2 sm:text-sm">
                             <span className="">
-                                Valor final: R${valorTotal?.toFixed(2)?.toString().replace('.',',')}
+                                Valor final: R${valorTotal?.toFixed(2)?.toString().replace('.', ',')}
                             </span>
                         </div>
 
@@ -159,17 +182,19 @@ export function ContainerProduct() {
             </div>
             <div className="flex flex-col items-start text-xs">
                 <label>Qtd:</label>
-                <input type="number" name="qtd" placeholder="Quantidade" className="border-2 border-black rounded w-full p-0.5 sm:p-1 text-center" />
+                <input type="text" name="qtd" placeholder="Quantidade" value={qtdValue} onChange={handleQtdValue}
+                    className="border-2 border-black rounded w-full p-0.5 sm:p-1 text-center" />
             </div>
             <div className="flex flex-col items-start text-xs">
                 <label>Valor:</label>
-                <input type="text" name="valor" placeholder="Valor" className="border-2 border-black rounded w-full p-0.5 sm:p-1 text-center" />
+                <input type="text" name="valor" placeholder="Valor" value={priceValue ? priceValue : ''} onChange={handlePriceValue}
+                    className="border-2 border-black rounded w-full p-0.5 sm:p-1 text-center" />
             </div>
             <div className="w-36 m-auto flex flex-col gap-2 text-center">
-            <button type="submit"
-                className="block w-full rounded bg-green-600  border-black border-2 px-1 py-0 self-center border-opacity-50 text-sm hover:scale-105 transition-all">Adicionar</button>
-            <button type="button" onClick={() => visualizarNota()}
-                className="block w-full  self-center py-0 px-1 rounded bg-yellow-500 border-2 border-black border-opacity-50 text-sm hover:scale-105 transition-all">Visualizar</button>
+                <button type="submit"
+                    className="block w-full rounded bg-green-600  border-black border-2 px-1 py-0 self-center border-opacity-50 text-sm hover:scale-105 transition-all">Adicionar</button>
+                <button type="button" onClick={() => visualizarNota()}
+                    className="block w-full  self-center py-0 px-1 rounded bg-yellow-500 border-2 border-black border-opacity-50 text-sm hover:scale-105 transition-all">Visualizar</button>
             </div>
         </form>
 

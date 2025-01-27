@@ -3,7 +3,8 @@ import { Lexend } from "next/font/google";
 import "./globals.css";
 import { MainProvider } from "@/providers/maincontext";
 import { Modal } from "./components/modal";
-import AdSense from "./components/AdSense/AdSense";
+// import AdSense from "./components/AdSense/AdSense";
+
 
 const lexend = Lexend({
   variable: "--font-lexend",
@@ -29,7 +30,7 @@ export default function RootLayout({
     <html lang="pt-br">
       <body
         className={`${lexend.variable} antialiased`}>
-        <AdSense pId={process.env.NEXT_PUBLIC_PUB_ID as string}></AdSense>
+        {/* <AdSense pId={process.env.NEXT_PUBLIC_PUB_ID as string}></AdSense> */}
         <MainProvider>
           <Modal></Modal>
           {children}

@@ -1,14 +1,18 @@
 'use client'
 import Image from "next/image";
-import { useEffect, useContext, useState } from "react";
+import { useEffect, useContext, useState, ChangeEvent } from "react";
 import { MainContext } from "@/providers/maincontext";
+import { CnpjMask, ContactMask } from "@/config/mask";
 
 
 
 export function OptionCabecalho() {
-    const { imageLogo, onReqSetImageLogo, cabecalho, onReqSetCabecalho, query, onReqHandleLogo, onReqRemoveLogo, onReqHandleCabecalho, isOpenForm, onReqSetIsOpenForm } = useContext(MainContext);
+    const { imageLogo, onReqSetImageLogo, cabecalho, onReqSetCabecalho, query, onReqHandleLogo, onReqRemoveLogo, onReqHandleCabecalho, isOpenForm, onReqSetIsOpenForm, error } = useContext(MainContext);
 
     const [isCabecalhoExtendido, setIsCabecalhoExtendido] = useState<boolean>(true);
+    const [maskedCnpjValue, setMaskedCnpjValue] = useState('');
+    const [maskedContactValue, setMaskedContactValue] = useState('');
+
     useEffect(() => {
         const header = localStorage.getItem('header');
         const logo = localStorage.getItem('logo');
@@ -22,11 +26,31 @@ export function OptionCabecalho() {
             setIsCabecalhoExtendido(false);
             onReqSetIsOpenForm(false)
         }
-    },[query])
+    }, [query])
 
+    const handleCnpjMask = (e: ChangeEvent<HTMLInputElement>) => {
+        const { value } = e.target;
+        const numericValue = value.replace(/\D/g, "");
+        
+        let maskedVarValue = CnpjMask(numericValue);
+        if (maskedVarValue.length > 18 ) return;
+
+        setMaskedCnpjValue(maskedVarValue);
+    }
+    
+    const handleContactMask = (e: ChangeEvent<HTMLInputElement>) => {
+        const { value } = e.target;
+        const numericValue = value.replace(/\D/g, "");
+
+        let maskedVarContactValue = ContactMask(numericValue);
+        if (maskedVarContactValue.length > 16 ) return;
+
+        setMaskedContactValue(maskedVarContactValue);
+    }
 
     return (
         <div className="flex flex-col min-w-72 w-full gap-1 text-xs p-1 sm:w-full sm:p-4 md:p-4 lg:p-4 xl:p-4 ">
+            
             {(cabecalho && !isOpenForm) &&
                 <div className="flex flex-col w-full bg-gray-200 rounded p-1 border-2 border-black sm:p-2 md:p-2 lg:p-2 xl:p-2 transition-all">
                     {isCabecalhoExtendido ? <>
@@ -63,6 +87,7 @@ export function OptionCabecalho() {
             {
                 isOpenForm &&
                 <form action={onReqHandleCabecalho} className="flex flex-col w-full bg-gray-200 rounded p-1 border-2 border-black sm:p-2 md:p-2 lg:p-2 xl:p-2">
+
                     <h2>Cabeçalho:</h2>
                     <div className="flex flex-col items-start text-xs sm:text-sm">
                         <label>Nome Fantasia:</label>
@@ -76,12 +101,12 @@ export function OptionCabecalho() {
                     </div>
                     <div className="flex flex-col items-start text-xs sm:text-sm">
                         <label>CNPJ:</label>
-                        <input type="text" name="cnpj" defaultValue={cabecalho?.cnpj}
-                            placeholder="Digite o CNPJ da empresa" className="border-2 border-black rounded w-full p-0.5 sm:p-1 text-center" />
+                        <input type="text" name="cnpj" value={ maskedCnpjValue ? maskedCnpjValue : cabecalho?.cnpj } onChange={handleCnpjMask}
+                            placeholder="Digite o CNPJ da empresa: xx.xxx.xxx/xxxx-xx" className="border-2 border-black rounded w-full p-0.5 sm:p-1 text-center" />
                     </div>
                     <div className="flex flex-col items-start text-xs sm:text-sm">
                         <label>Contato:</label>
-                        <input type="text" name="contato_empresa" defaultValue={cabecalho?.contato_empresa}
+                        <input type="text" name="contato_empresa" value={ maskedContactValue ? maskedContactValue : cabecalho?.contato_empresa } onChange={handleContactMask}
                             placeholder="Digite o contato da empresa" className="border-2 border-black rounded w-full p-0.5 sm:p-1 text-center" />
                     </div>
                     <div className="flex flex-col items-start text-xs sm:text-sm">

@@ -1,6 +1,8 @@
 "use client"
-import React, { ChangeEvent, createContext, ReactNode, useState } from 'react'
-import { Cliente, Produto } from '@/app/components/containerProduct'
+import React, { ChangeEvent, createContext, ReactNode, useState } from 'react';
+import { Cliente, Produto } from '@/app/components/containerProduct';
+import { cabecalhoSchema } from '@/config/ZodSchema';
+
 
 type MainContextData = {
     cliente?: Cliente;
@@ -23,6 +25,8 @@ type MainContextData = {
     isAllowedCookies?: boolean;
     onReqSetIsAllowedCookies: (value: boolean)=>void;
     imageLogoWidth?: number;
+    error?: string;
+    onReqSetError: (msg: string)=>void;
 }
 
 type ContextProps = {
@@ -49,6 +53,11 @@ export function MainProvider({ children } : ContextProps ) {
     const [query, setQuery] = useState(0);
     const [isOpenForm, setIsOpenForm] = useState<boolean>(cabecalho ? false : true);
     const [isAllowedCookies, setIsAllowedCookies] = useState<boolean>();
+    const [error, setError] = useState('');
+    
+    function onReqSetError(msg: string){
+        setError(msg);
+    }
     
     function onReqSetCliente(cliente : Cliente){
         setCliente(cliente);
@@ -70,28 +79,46 @@ export function MainProvider({ children } : ContextProps ) {
 
     function onReqHandleCabecalho(formData: FormData) {
         const data = Object.fromEntries(formData.entries());
-
-        localStorage.setItem('header', JSON.stringify(data))
+        const result = cabecalhoSchema.safeParse(data);
+        if(!result.success){
+            const erros = result.error.errors.map((err)=> err.message)
+            console.log(erros)
+            setError(erros.toString())
+            return;
+        }
+        
+        localStorage.setItem('header', JSON.stringify(result.data))
 
         setIsOpenForm(!isOpenForm)
+        
+        setError('Cabeçalho salvo!')
 
+        
+        setTimeout(() => {
+            setError('')
+        }, 1000);
+        
         setQuery(Date.now())
     }
 
     function onReqSetImageLogo(logo: string){
         setImageLogo(logo);
     }
+
     function onReqSetCabecalho(cabecalho: CabecalhoProps){
         setCabecalho(cabecalho);
     }
+
     function onReqHandleLogo(e: ChangeEvent<HTMLInputElement>) {
         if (e.target.files) {
             const reader = new FileReader();
             const image = e.target.files[0];
+
             if((image.type !== 'image/jpeg') && (image.type !== 'image/png')){
-                window.alert('Por favor, insira uma imagem JPEG ou PNG')
+                setError('Imagem deve ser no formato PNG ou JPEG! Favor envie no formato solicitado!')
                 return;
             }
+
             const img = new Image();
             
             
@@ -113,6 +140,7 @@ export function MainProvider({ children } : ContextProps ) {
             img.src = URL.createObjectURL(image)
             reader.readAsDataURL(image);
             setQuery(Date.now())
+            setError('')
         }
     }
     function onReqSetQuery(){
@@ -154,7 +182,9 @@ export function MainProvider({ children } : ContextProps ) {
             onReqSetIsOpenForm,
             isAllowedCookies,
             onReqSetIsAllowedCookies,
-            imageLogoWidth
+            imageLogoWidth,
+            error,
+            onReqSetError
         }}>
         {children}
         </MainContext.Provider>
